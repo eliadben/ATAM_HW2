@@ -193,7 +193,7 @@ ev_document_model_get_property (GObject    *object,
 		break;
 //Creator-mode
 	case PROP_CREATOR_MODE:
-		ev_document_model_set_creator_mode (model, ev_document_model_get_creator_mode (value));
+		ev_document_model_set_creator_mode (value, ev_document_model_get_creator_mode (model));
 		break;
 	case PROP_PAGE_LAYOUT:
 		g_value_set_enum (value, model->page_layout);
@@ -307,6 +307,15 @@ ev_document_model_class_init (EvDocumentModelClass *klass)
 							       TRUE,
 							       G_PARAM_READWRITE |
                                                                G_PARAM_STATIC_STRINGS));
+//Creator-mode
+	g_object_class_install_property (g_object_class,
+					 PROP_CREATOR_MODE,
+					 g_param_spec_boolean ("creator-mode",
+							       "Creator Mode",
+							       "Whether document is displayed in creator mode",
+							       FALSE,
+							       G_PARAM_READWRITE |
+                                                               G_PARAM_STATIC_STRINGS));
 	g_object_class_install_property (g_object_class,
 					 PROP_DUAL_PAGE,
 					 g_param_spec_boolean ("dual-page",
@@ -359,6 +368,7 @@ ev_document_model_init (EvDocumentModel *model)
 	model->scale = 1.;
 	model->sizing_mode = EV_SIZING_FIT_WIDTH;
 	model->continuous = TRUE;
+	model->creator_mode = FALSE;
 	model->inverted_colors = FALSE;
 	model->min_scale = DEFAULT_MIN_SCALE;
 	model->max_scale = DEFAULT_MAX_SCALE;
@@ -693,7 +703,7 @@ ev_document_model_set_creator_mode (EvDocumentModel *model,
 {
 	g_return_if_fail (EV_IS_DOCUMENT_MODEL (model));
 
-	creator_mode = creator_mode != FALSE;
+	creator_mode = creator_mode != TRUE;
 
 	if (creator_mode == model->creator_mode)
 		return;

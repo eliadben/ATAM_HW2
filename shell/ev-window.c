@@ -525,6 +525,8 @@ ev_window_update_actions_sensitivity (EvWindow *ev_window)
         /* View menu */
 	ev_window_set_action_enabled (ev_window, "continuous", has_pages &&
 				      !recent_view_mode);
+	ev_window_set_action_enabled (ev_window, "creator-mode", has_pages &&
+				      !recent_view_mode);
 	ev_window_set_action_enabled (ev_window, "dual-page", has_pages &&
 				      !recent_view_mode);
 	ev_window_set_action_enabled (ev_window, "rtl", has_pages &&
@@ -1127,6 +1129,10 @@ ev_window_init_metadata_with_default_values (EvWindow *window)
 		ev_metadata_set_boolean (metadata, "continuous",
 					 g_settings_get_boolean (settings, "continuous"));
 	}
+	if (!ev_metadata_has_key (metadata, "creator-mode")) {
+		ev_metadata_set_boolean (metadata, "creator-mode",
+					 g_settings_get_boolean (settings, "creator-mode"));
+	}
 	if (!ev_metadata_has_key (metadata, "dual-page")) {
 		ev_metadata_set_boolean (metadata, "dual-page",
 					 g_settings_get_boolean (settings, "dual-page"));
@@ -1204,6 +1210,7 @@ setup_model_from_metadata (EvWindow *window)
 	gint     rotation;
 	gboolean inverted_colors = FALSE;
 	gboolean continuous = FALSE;
+    gboolean creator_mode = FALSE;
 	gboolean dual_page = FALSE;
 	gboolean dual_page_odd_left = FALSE;
 	gboolean rtl = FALSE;
@@ -1264,6 +1271,12 @@ setup_model_from_metadata (EvWindow *window)
 	if (ev_metadata_get_boolean (priv->metadata, "continuous", &continuous)) {
 		ev_document_model_set_continuous (priv->model, continuous);
 	}
+
+	/* Creator Mode */
+	if (ev_metadata_get_boolean (priv->metadata, "creator-mode", &creator_mode)) {
+		ev_document_model_set_creator_mode (priv->model, creator_mode);
+	}
+
 
 	/* Dual page */
 	if (ev_metadata_get_boolean (priv->metadata, "dual-page", &dual_page)) {
@@ -1491,6 +1504,7 @@ ev_window_setup_default (EvWindow *ev_window)
 
 	/* Document model */
 	ev_document_model_set_continuous (model, g_settings_get_boolean (settings, "continuous"));
+	ev_document_model_set_creator_mode (model, g_settings_get_boolean (settings, "creator-mode"));
 	ev_document_model_set_dual_page (model, g_settings_get_boolean (settings, "dual-page"));
 	ev_document_model_set_dual_page_odd_pages_left (model, g_settings_get_boolean (settings, "dual-page-odd-left"));
 	ev_document_model_set_rtl (model, gtk_widget_get_default_direction () == GTK_TEXT_DIR_RTL ? TRUE : FALSE);
@@ -5294,6 +5308,24 @@ ev_window_continuous_changed_cb (EvDocumentModel *model,
 }
 
 static void
+ev_window_creator_mode_changed_cb (EvDocumentModel *model,
+				 GParamSpec      *pspec,
+				 EvWindow        *ev_window)
+{
+	EvWindowPrivate *priv = GET_PRIVATE (ev_window);
+	gboolean creator_mode;
+	GAction *action;
+
+	creator_mode = ev_document_model_get_creator_mode (model);
+
+	action = g_action_map_lookup_action (G_ACTION_MAP (ev_window), "creator-mode");
+	g_simple_action_set_state (G_SIMPLE_ACTION (action), g_variant_new_boolean (creator_mode));
+
+	if (priv->metadata && !ev_window_is_empty (ev_window))
+		ev_metadata_set_boolean (priv->metadata, "creator-mode", creator_mode);
+}
+
+static void
 ev_window_rotation_changed_cb (EvDocumentModel *model,
 			       GParamSpec      *pspec,
 			       EvWindow        *window)
@@ -7733,6 +7765,10 @@ ev_window_init (EvWindow *ev_window)
 	g_signal_connect (priv->model,
 			  "notify::continuous",
 			  G_CALLBACK (ev_window_continuous_changed_cb),
+			  ev_window);
+	g_signal_connect (priv->model,
+			  "notify::creator-mode",
+			  G_CALLBACK (ev_window_creator_mode_changed_cb),
 			  ev_window);
 	g_signal_connect (priv->model,
 			  "notify::dual-page",
