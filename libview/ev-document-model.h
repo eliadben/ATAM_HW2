@@ -89,6 +89,11 @@ gboolean       ev_document_model_get_inverted_colors (EvDocumentModel *model);
 void             ev_document_model_set_continuous    (EvDocumentModel *model,
 						      gboolean         continuous);
 gboolean         ev_document_model_get_continuous    (EvDocumentModel *model);
+
+//Creator-mode
+void             ev_document_model_set_creator_mode    (EvDocumentModel *model,
+						      gboolean         creator_mode);
+gboolean         ev_document_model_get_creator_mode    (EvDocumentModel *model);
 void             ev_document_model_set_dual_page_odd_pages_left (EvDocumentModel *model,
 								 gboolean         odd_left);
 gboolean         ev_document_model_get_dual_page_odd_pages_left (EvDocumentModel *model);

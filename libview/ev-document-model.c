@@ -37,6 +37,8 @@ struct _EvDocumentModel
 	EvSizingMode sizing_mode;
 	EvPageLayout page_layout;
 	guint continuous : 1;
+//Creator-mode
+	guint creator_mode : 1;
 	guint dual_page  : 1;
 	guint dual_page_odd_left : 1;
 	guint rtl : 1;
@@ -56,6 +58,8 @@ enum {
 	PROP_SCALE,
 	PROP_SIZING_MODE,
 	PROP_CONTINUOUS,
+//Creator-mode
+	PROP_CREATOR_MODE,
 	PROP_DUAL_PAGE,
 	PROP_DUAL_PAGE_ODD_LEFT,
 	PROP_RTL,
@@ -127,6 +131,10 @@ ev_document_model_set_property (GObject      *object,
 	case PROP_CONTINUOUS:
 		ev_document_model_set_continuous (model, g_value_get_boolean (value));
 		break;
+//Creator-mode
+	case PROP_CREATOR_MODE:
+		ev_document_model_set_creator_mode (model, g_value_get_boolean (value));
+		break;
 	case PROP_PAGE_LAYOUT:
 		ev_document_model_set_page_layout (model, g_value_get_enum (value));
 		break;
@@ -182,6 +190,10 @@ ev_document_model_get_property (GObject    *object,
 		break;
 	case PROP_CONTINUOUS:
 		g_value_set_boolean (value, ev_document_model_get_continuous (model));
+		break;
+//Creator-mode
+	case PROP_CREATOR_MODE:
+		ev_document_model_set_creator_mode (model, ev_document_model_get_creator_mode (value));
 		break;
 	case PROP_PAGE_LAYOUT:
 		g_value_set_enum (value, model->page_layout);
@@ -672,6 +684,35 @@ ev_document_model_get_continuous (EvDocumentModel *model)
 
 	return model->continuous;
 }
+
+//Creator_mode
+
+void
+ev_document_model_set_creator_mode (EvDocumentModel *model,
+				  gboolean         creator_mode)
+{
+	g_return_if_fail (EV_IS_DOCUMENT_MODEL (model));
+
+	creator_mode = creator_mode != FALSE;
+
+	if (creator_mode == model->creator_mode)
+		return;
+
+	model->creator_mode = creator_mode;
+
+	g_object_notify (G_OBJECT (model), "creator-mode");
+}
+
+gboolean
+ev_document_model_get_creator_mode (EvDocumentModel *model)
+{
+	g_return_val_if_fail (EV_IS_DOCUMENT_MODEL (model), TRUE);
+
+	return model->creator_mode;
+}
+
+
+
 
 /**
  * ev_document_model_set_dual_page:

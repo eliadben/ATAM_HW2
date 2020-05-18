@@ -83,6 +83,9 @@
     <key name="sidebar-size" type="i">
       <default>132</default>
     </key>
+    <key name = "creator-mode" type="b">
+	<default>false</default>
+    </key>
   </schema>
 
 </schemalist>

@@ -71,6 +71,10 @@
         <attribute name="action">win.continuous</attribute>
       </item>
       <item>
+        <attribute name="label" translatable="yes">_Creator Mode</attribute>
+        <attribute name="action">win.creator-mode</attribute>
+      </item>
+      <item>
         <attribute name="label" translatable="yes">_Dual</attribute>
         <attribute name="action">win.dual-page</attribute>
       </item>

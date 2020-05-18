@@ -4128,6 +4128,19 @@ ev_window_cmd_continuous (GSimpleAction *action,
 }
 
 static void
+ev_window_cmd_creator_mode (GSimpleAction *action,
+			  GVariant      *state,
+			  gpointer       user_data)
+{
+	EvWindow *window = user_data;
+	EvWindowPrivate *priv = GET_PRIVATE (window);
+
+	ev_window_stop_presentation (window, TRUE);
+	ev_document_model_set_creator_mode (priv->model, g_variant_get_boolean (state));
+	g_simple_action_set_state (action, state);
+}
+
+static void
 ev_window_cmd_dual (GSimpleAction *action,
 		    GVariant      *state,
 		    gpointer       user_data)
@@ -4920,6 +4933,9 @@ ev_window_cmd_edit_save_settings (GSimpleAction *action,
 
 	g_settings_set_boolean (settings, "continuous",
 				ev_document_model_get_continuous (model));
+	//Creator_mode
+	g_settings_set_boolean (settings, "creator-mode",
+				ev_document_model_get_creator_mode (model));
 	g_settings_set_boolean (settings, "dual-page",
         			ev_document_model_get_dual_page (model));
 	g_settings_set_boolean (settings, "dual-page-odd-left",
@@ -6296,6 +6312,7 @@ static const GActionEntry actions[] = {
 	{ "find-previous", ev_window_cmd_edit_find_previous },
 	{ "select-page", ev_window_cmd_focus_page_selector },
 	{ "continuous", NULL, NULL, "true", ev_window_cmd_continuous },
+	{ "creator-mode", NULL, NULL, "false", ev_window_cmd_creator_mode },
 	{ "dual-page", NULL, NULL, "false", ev_window_cmd_dual },
 	{ "dual-odd-left", NULL, NULL, "false", ev_window_cmd_dual_odd_pages_left },
 	{ "rtl", NULL, NULL, "false", ev_window_cmd_rtl },
