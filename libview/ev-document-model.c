@@ -193,7 +193,7 @@ ev_document_model_get_property (GObject    *object,
 		break;
 //Creator-mode
 	case PROP_CREATOR_MODE:
-		ev_document_model_set_creator_mode (value, ev_document_model_get_creator_mode (model));
+        g_value_set_boolean (value, ev_document_model_get_creator_mode (model));
 		break;
 	case PROP_PAGE_LAYOUT:
 		g_value_set_enum (value, model->page_layout);
@@ -435,6 +435,9 @@ ev_document_model_set_page (EvDocumentModel *model,
 
 	if (model->page == page)
 		return;
+//Creator-Mode
+	if(model->creator_mode && page ==0)
+	    return;
 	if (page < 0 || (model->document && page >= model->n_pages))
 		return;
 
@@ -703,7 +706,7 @@ ev_document_model_set_creator_mode (EvDocumentModel *model,
 {
 	g_return_if_fail (EV_IS_DOCUMENT_MODEL (model));
 
-	creator_mode = creator_mode != TRUE;
+	creator_mode = creator_mode != FALSE;
 
 	if (creator_mode == model->creator_mode)
 		return;

@@ -5053,7 +5053,7 @@ ev_window_cmd_go_first_page (GSimpleAction *action,
 	EvWindow *window = user_data;
 	EvWindowPrivate *priv = GET_PRIVATE (window);
 
-	ev_document_model_set_page (priv->model, 0);
+	    ev_document_model_set_page (priv->model, 0);
 }
 
 static void
